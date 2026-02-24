@@ -354,16 +354,6 @@ ${selectedSize ? `📏 Talla: ${selectedSize.size}` : ''}
               </div>
             )}
 
-            {/* Información adicional */}
-            <div className="grid grid-cols-2 gap-4 pt-6">
-              <div className="flex items-center gap-3 p-4 bg-neutral-50 rounded-xl">
-                <div className="text-2xl">🚚</div>
-                <div>
-                  <p className="font-semibold text-sm">Envío Gratis</p>
-                  <p className="text-xs text-gray-600">En compras +$999</p>
-                </div>
-              </div>
-            </div>
           </motion.div>
         </div>
       </div>
