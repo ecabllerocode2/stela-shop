@@ -24,6 +24,7 @@ export const StoreProvider = ({ slug, children }) => {
   const [store, setStore] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [storeInactive, setStoreInactive] = useState(false);
 
   useEffect(() => {
     if (!slug) {
@@ -35,6 +36,7 @@ export const StoreProvider = ({ slug, children }) => {
     const loadStore = async () => {
       setLoading(true);
       setError(null);
+      setStoreInactive(false);
 
       try {
         // Buscar usuario por slug en la colección 'users'
@@ -54,6 +56,17 @@ export const StoreProvider = ({ slug, children }) => {
 
         const userDoc = snapshot.docs[0];
         const userData = userDoc.data();
+
+        // Verificar si la tienda está activa (requiere plan Business)
+        if (userData.tiendaActiva !== true) {
+          setStoreInactive(true);
+          setStore({
+            nombreNegocio: userData.nombreNegocio || userData.nombre || '',
+            logo: userData.logo || null,
+          });
+          setLoading(false);
+          return;
+        }
 
         setStore({
           userId: userDoc.id,
@@ -105,6 +118,7 @@ export const StoreProvider = ({ slug, children }) => {
     store,
     loading,
     error,
+    storeInactive,
     getWhatsAppLink,
   };
 
