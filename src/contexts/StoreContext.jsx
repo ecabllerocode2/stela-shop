@@ -57,8 +57,18 @@ export const StoreProvider = ({ slug, children }) => {
         const userDoc = snapshot.docs[0];
         const userData = userDoc.data();
 
-        // Verificar si la tienda está activa (requiere plan Business)
-        if (userData.tiendaActiva !== true) {
+        // Verificar si la tienda está activa (requiere plan Business o trial activo)
+        let tiendaActiva = userData.tiendaActiva === true;
+
+        // Si tiendaActiva no está marcada por webhook, verificar trial local vigente
+        if (!tiendaActiva && userData.trialEndsAt) {
+          const trialEnd = userData.trialEndsAt?.toDate
+            ? userData.trialEndsAt.toDate()
+            : new Date(userData.trialEndsAt);
+          tiendaActiva = new Date() < trialEnd;
+        }
+
+        if (!tiendaActiva) {
           setStoreInactive(true);
           setStore({
             nombreNegocio: userData.nombreNegocio || userData.nombre || '',
