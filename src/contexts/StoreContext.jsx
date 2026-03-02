@@ -60,12 +60,47 @@ export const StoreProvider = ({ slug, children }) => {
         // Verificar si la tienda está activa (requiere plan Business o trial activo)
         let tiendaActiva = userData.tiendaActiva === true;
 
-        // Si tiendaActiva no está marcada por webhook, verificar trial local vigente
-        if (!tiendaActiva && userData.trialEndsAt) {
-          const trialEnd = userData.trialEndsAt?.toDate
-            ? userData.trialEndsAt.toDate()
-            : new Date(userData.trialEndsAt);
-          tiendaActiva = new Date() < trialEnd;
+        // Si tiendaActiva fue seteada durante registro (no por webhook Stripe),
+        // validar que el trial siga vigente
+        if (tiendaActiva && !userData.tiendaSetByWebhook) {
+          let trialEnd = null;
+          if (userData.trialEndsAt) {
+            trialEnd = userData.trialEndsAt?.toDate
+              ? userData.trialEndsAt.toDate()
+              : new Date(userData.trialEndsAt);
+          } else if (userData.createdAt) {
+            const created = userData.createdAt?.toDate
+              ? userData.createdAt.toDate()
+              : new Date(userData.createdAt);
+            trialEnd = new Date(created);
+            trialEnd.setDate(trialEnd.getDate() + 15);
+          }
+          if (trialEnd && new Date() >= trialEnd) {
+            tiendaActiva = false; // Trial expirado
+          }
+        }
+
+        // Si tiendaActiva no está confirmada y no fue desactivada por webhook,
+        // verificar trial vigente.
+        // Un webhook que desactiva la tienda (por cambio a emprendedor) debe
+        // prevalecer sobre la comprobación de trial.
+        if (!tiendaActiva && !userData.tiendaSetByWebhook) {
+          let trialEnd = null;
+          if (userData.trialEndsAt) {
+            trialEnd = userData.trialEndsAt?.toDate
+              ? userData.trialEndsAt.toDate()
+              : new Date(userData.trialEndsAt);
+          } else if (userData.createdAt) {
+            // Fallback: 15 días desde creación de cuenta
+            const created = userData.createdAt?.toDate
+              ? userData.createdAt.toDate()
+              : new Date(userData.createdAt);
+            trialEnd = new Date(created);
+            trialEnd.setDate(trialEnd.getDate() + 15);
+          }
+          if (trialEnd && new Date() < trialEnd) {
+            tiendaActiva = true;
+          }
         }
 
         if (!tiendaActiva) {
