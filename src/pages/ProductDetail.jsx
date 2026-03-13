@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProducts } from '../contexts/ProductsContext';
-import { useStore } from '../contexts/StoreContext';
 import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Thumbs, Zoom } from 'swiper/modules';
@@ -25,9 +24,8 @@ import { cn } from '../utils/cn';
 import { toast } from 'react-toastify';
 
 const ProductDetail = () => {
-  const { productId, slug } = useParams();
+  const { productId } = useParams();
   const navigate = useNavigate();
-  const { store, getWhatsAppLink } = useStore();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -53,7 +51,7 @@ const ProductDetail = () => {
 
         if (data) {
           if (!data.publishOnline) {
-            navigate(slug ? `/${slug}` : '/');
+            navigate('/404');
             return;
           }
 
@@ -62,7 +60,7 @@ const ProductDetail = () => {
             setSelectedVariant(data.variants[0]);
           }
         } else {
-          navigate(slug ? `/${slug}` : '/');
+          navigate('/404');
         }
       } catch (err) {
         console.error('Error loading product:', err);
@@ -87,6 +85,7 @@ const ProductDetail = () => {
       return;
     }
 
+    // Generar SKU si existe una talla seleccionada
     const sku = selectedSize?.variantSku || `${product.id}-${selectedVariant.id}${selectedSize ? `-${selectedSize.size}` : ''}`;
 
     const message = `¡Hola! Me interesa el siguiente producto:
@@ -99,7 +98,7 @@ ${selectedSize ? `📏 Talla: ${selectedSize.size}` : ''}
 
 ¿Está disponible?`;
 
-    const url = getWhatsAppLink(message);
+    const url = `https://wa.me/5215615967613?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
@@ -354,6 +353,16 @@ ${selectedSize ? `📏 Talla: ${selectedSize.size}` : ''}
               </div>
             )}
 
+            {/* Información adicional */}
+            <div className="grid grid-cols-2 gap-4 pt-6">
+              <div className="flex items-center gap-3 p-4 bg-neutral-50 rounded-xl">
+                <div className="text-2xl">🚚</div>
+                <div>
+                  <p className="font-semibold text-sm">Envío Gratis</p>
+                  <p className="text-xs text-gray-600">En compras +$999</p>
+                </div>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>

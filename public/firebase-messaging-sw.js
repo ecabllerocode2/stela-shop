@@ -12,13 +12,13 @@ importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-com
 // your app's Firebase config object.
 // https://firebase.google.com/docs/web/setup#config-object
 firebase.initializeApp({
-  apiKey: "AIzaSyDYJbwJgqTFBdToJIkhMRbwbI0x88QiCwI",
-  authDomain: "stela-a8c06.firebaseapp.com",
-  projectId: "stela-a8c06",
-  storageBucket: "stela-a8c06.firebasestorage.app",
-  messagingSenderId: "844317368141",
-  appId: "1:844317368141:web:d4f862c7a7ee32859f6104",
-  measurementId: "G-GEM1LZE0TF"
+  apiKey: "AIzaSyAcPmOLCEeL5sRenwhtTWCIBawWNcnD4Ls",
+  authDomain: "malim-app.firebaseapp.com",
+  projectId: "malim-app",
+  storageBucket: "malim-app.firebasestorage.app",
+  messagingSenderId: "953747301080",
+  appId: "1:953747301080:web:d3cfd18e9be012bb822dad",
+  measurementId: "G-9DD5YEX28R"
 });
 
 // Retrieve an instance of Firebase Messaging so that it can handle background

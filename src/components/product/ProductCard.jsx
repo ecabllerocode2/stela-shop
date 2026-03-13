@@ -1,13 +1,12 @@
 // Componente de tarjeta de producto para el catálogo
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Image from '../ui/Image';
 import Badge from '../ui/Badge';
 import { formatPrice, calculateDiscountedPrice, getMainImage } from '../../utils/format';
+// removed unused 'cn' import
 
 const ProductCard = ({ product, index = 0 }) => {
-  const { slug } = useParams();
-  const basePath = slug ? `/${slug}` : '';
   const mainImage = getMainImage(product);
   const hasDiscount = product.offerPercentage > 0;
   const finalPrice = calculateDiscountedPrice(
@@ -21,7 +20,7 @@ const ProductCard = ({ product, index = 0 }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.05 }}
     >
-      <Link to={`${basePath}/producto/${product.id}`}>
+      <Link to={`/producto/${product.id}`}>
         <motion.div
           className="group relative"
           whileHover={{ y: -4 }}

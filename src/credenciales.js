@@ -1,17 +1,19 @@
-// credenciales.js - Stela Shop (conectado a proyecto stela-a8c06)
+// credenciales.js
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, collection, addDoc, query, where, Timestamp, getDocs, enableIndexedDbPersistence } from "firebase/firestore";
+import { getMessaging, getToken } from "firebase/messaging";
 import { getAnalytics } from "firebase/analytics";
+import { getAuth } from "firebase/auth";
 
-// Configuración de Firebase - Proyecto Stela
+// Configuración de Firebase
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY ?? "AIzaSyDYJbwJgqTFBdToJIkhMRbwbI0x88QiCwI",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ?? "stela-a8c06.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ?? "stela-a8c06",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ?? "stela-a8c06.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID ?? "844317368141",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID ?? "1:844317368141:web:d4f862c7a7ee32859f6104",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID ?? "G-GEM1LZE0TF"
+  apiKey: "AIzaSyAcPmOLCEeL5sRenwhtTWCIBawWNcnD4Ls",
+  authDomain: "malim-app.firebaseapp.com",
+  projectId: "malim-app",
+  storageBucket: "malim-app.firebasestorage.app",
+  messagingSenderId: "953747301080",
+  appId: "1:953747301080:web:d3cfd18e9be012bb822dad",
+  measurementId: "G-9DD5YEX28R"
 };
 
 // Inicializa Firebase
@@ -20,11 +22,56 @@ const app = initializeApp(firebaseConfig);
 // Firestore
 const db = getFirestore(app);
 
+// Habilitar persistence (IndexedDB) para reducir lecturas de red cuando sea posible
+try {
+  enableIndexedDbPersistence(db).catch((err) => {
+    if (err.code === 'failed-precondition') {
+      console.warn('Persistence no activada: múltiples pestañas abiertas');
+    } else {
+      console.warn('Persistence no soportada:', err);
+    }
+  });
+} catch {
+  // En algunos entornos (SSR) esto puede fallar; ignorar
+}
+
+// Messaging
+const messaging = getMessaging(app);
+
 // Analytics (solo si window existe)
 const analytics = typeof window !== "undefined" ? getAnalytics(app) : null;
 
+// Auth
+const auth = getAuth(app);
+
 // Backend API
-export const BACKEND_API_URL = import.meta.env.VITE_BACKEND_URL ?? 'https://stela-backend.vercel.app';
+export const BACKEND_API_URL = 'https://malim-backend.vercel.app';
 
 // Exporta instancias
-export { db, analytics };
+export { db, messaging, analytics, auth };
+
+export const generateToken = async () => {
+  const permission = await Notification.requestPermission();
+  console.log(permission);
+  if (permission === "granted") {
+    const token = await getToken(messaging, {
+      vapidKey: "BPM6VClBoZtrYgw2TlJ4o4CPgWOLCbpE9lYdHbV-8RX_x6MaYFUEWG0EjBf7iDEVTMaaObPfU5MB87SPrC2u4rg"
+    });
+    console.log(token);
+    if (token) {
+      const tokensRef = collection(db, "tokens");
+      const q = query(tokensRef, where("token", "==", token));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        await addDoc(tokensRef, {
+          token,
+          timestamp: Timestamp.now()
+        });
+        console.log("Token guardado");
+      } else {
+        console.log("El token ya existe en la base de datos");
+      }
+    }
+  }
+};

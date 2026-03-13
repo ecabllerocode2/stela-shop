@@ -48,9 +48,9 @@ export default defineConfig({
         cleanupOutdatedCaches: true // Limpia cachés viejos automáticamente
       },
       manifest: {
-        name: 'Stela Shop',
-        short_name: 'Stela',
-        description: 'Tu tienda online potenciada por Stela',
+        name: 'Malim Shop',
+        short_name: 'Malim',
+        description: 'App en la que puedes ver todo lo disponible en malim',
         start_url: '/',
         display: 'standalone',
         background_color: '#ffffff',

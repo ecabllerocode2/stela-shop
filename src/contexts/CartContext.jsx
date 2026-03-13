@@ -6,15 +6,13 @@ import PropTypes from 'prop-types';
 
 const CartContext = createContext();
 
-const CART_KEY = 'stela-cart';
-
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
 
   // Cargar carrito desde localStorage al iniciar
   useEffect(() => {
-    const savedCart = localStorage.getItem(CART_KEY);
+    const savedCart = localStorage.getItem('malim-cart');
     if (savedCart) {
       try {
         setCart(JSON.parse(savedCart));
@@ -26,7 +24,7 @@ export const CartProvider = ({ children }) => {
 
   // Guardar carrito en localStorage cuando cambie
   useEffect(() => {
-    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    localStorage.setItem('malim-cart', JSON.stringify(cart));
   }, [cart]);
 
   // Añadir producto al carrito
@@ -76,7 +74,7 @@ export const CartProvider = ({ children }) => {
   // Vaciar carrito
   const clearCart = (silent = false) => {
     setCart([]);
-    localStorage.removeItem(CART_KEY);
+    localStorage.removeItem('malim-cart');
     if (!silent) {
       toast.info('Carrito vaciado');
     }
